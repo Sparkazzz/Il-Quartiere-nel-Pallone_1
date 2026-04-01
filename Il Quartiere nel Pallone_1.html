@@ -265,7 +265,7 @@
     <div class="content">
       <section id="setupScreen" class="card">
         <label for="playersInput">Nomi giocatori</label>
-        <textarea id="playersInput" placeholder="Esempio: Luca, Marco, Ale, Fede"></textarea>
+        <textarea id="playersInput" placeholder="Esempio: Bacco, Tripolí, Bollicó"></textarea>
         <div class="small">Scrivi i nomi separati da virgola. Il gioco funziona su un solo dispositivo: ogni giocatore fa il proprio turno.</div>
         <div class="actions">
           <button class="primary" id="startBtn">Inizia il quiz</button>
@@ -540,12 +540,6 @@
         `;
         rankingBody.appendChild(row);
       });
-    }
-
-    function restartGame() {
-      playersInput.value = players.map(p => p.name).join(', ');
-      resultScreen.classList.add('hidden');
-      setupScreen.classList.remove('hidden');
     }
 
     startBtn.addEventListener('click', startGame);
