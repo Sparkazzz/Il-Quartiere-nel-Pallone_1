@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Calcio Difficile</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --card-2: #1f2937;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #22c55e;
+      --accent-2: #16a34a;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --border: rgba(255,255,255,0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #020617, #0f172a);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 900px;
+      background: rgba(17, 24, 39, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 24px 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+    }
+
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .content {
+      padding: 28px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+    }
+
+    .hidden { display: none; }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: #0b1220;
+      color: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .small {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 18px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .primary {
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      color: white;
+    }
+
+    .secondary {
+      background: #334155;
+      color: white;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .pill {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .pill .label {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .pill .value {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .timer-bar {
+      width: 100%;
+      height: 12px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 16px 0 22px;
+    }
+
+    .timer-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+      transition: width 1s linear;
+    }
+
+    .question {
+      font-size: 28px;
+      line-height: 1.35;
+      margin-bottom: 22px;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .answer-btn {
+      text-align: left;
+      background: #0b1220;
+      color: white;
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 16px;
+      min-height: 72px;
+      font-size: 16px;
+    }
+
+    .answer-btn.correct {
+      background: rgba(34, 197, 94, 0.18);
+      border-color: rgba(34, 197, 94, 0.55);
+    }
+
+    .answer-btn.wrong {
+      background: rgba(239, 68, 68, 0.16);
+      border-color: rgba(239, 68, 68, 0.55);
+    }
+
+    .status {
+      margin-top: 18px;
+      min-height: 24px;
+      color: var(--muted);
+      font-weight: bold;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 16px;
+    }
+
+    th, td {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .first {
+      color: #facc15;
+      font-weight: bold;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 720px) {
+      .topbar { grid-template-columns: 1fr 1fr; }
+      .answers { grid-template-columns: 1fr; }
+      .question { font-size: 24px; }
+      .header h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>Quiz Calcio Difficile</h1>
+      <p>Gioco gratis in un solo file. Inserisci i giocatori, rispondi entro 10 secondi, poi guarda la classifica finale.</p>
+    </div>
+
+    <div class="content">
+      <section id="setupScreen" class="card">
+        <label for="playersInput">Nomi giocatori</label>
+        <textarea id="playersInput" placeholder="Esempio: Luca, Marco, Ale, Fede"></textarea>
+        <div class="small">Scrivi i nomi separati da virgola. Il gioco funziona su un solo dispositivo: ogni giocatore fa il proprio turno.</div>
+        <div class="actions">
+          <button class="primary" id="startBtn">Inizia il quiz</button>
+        </div>
+        <div class="footer-note">
+          Regole: 1 punto per risposta giusta, 0 per risposta sbagliata o tempo scaduto. Ogni giocatore riceve le stesse domande nello stesso ordine.
+        </div>
+      </section>
+
+      <section id="gameScreen" class="hidden">
+        <div class="topbar">
+          <div class="pill"><span class="label">Giocatore</span><span class="value" id="playerLabel">-</span></div>
+          <div class="pill"><span class="label">Domanda</span><span class="value" id="questionLabel">-</span></div>
+          <div class="pill"><span class="label">Punti</span><span class="value" id="scoreLabel">0</span></div>
+          <div class="pill"><span class="label">Tempo</span><span class="value" id="timeLabel">10s</span></div>
+        </div>
+
+        <div class="card">
+          <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+          <div class="question" id="questionText"></div>
+          <div class="answers" id="answersBox"></div>
+          <div class="status" id="statusText"></div>
+        </div>
+      </section>
+
+      <section id="resultScreen" class="card hidden">
+        <h2>Classifica finale</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Giocatore</th>
+              <th>Punti</th>
+            </tr>
+          </thead>
+          <tbody id="rankingBody"></tbody>
+        </table>
+        <div class="actions">
+          <button class="primary" id="restartBtn">Rigioca</button>
+        </div>
+        <div class="footer-note">Puoi modificare le domande direttamente nel file <strong>index.html</strong>, nella variabile <strong>questions</strong>.</div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const QUESTION_TIME = 10;
+
+    const questions = [
+      {
+        q: "Quale giocatore ha segnato il primo gol nella storia della Serie A a girone unico nel 1929?",
+        options: ["Angelo Schiavio", "Marcello Mihalich", "Giuseppe Meazza", "Julio Libonatti"],
+        answer: 1
+      },
+      {
+        q: "Chi fu capocannoniere del Mondiale 1990 senza aver giocato la finale?",
+        options: ["Salvatore Schillaci", "Gary Lineker", "Lothar Matthäus", "Roger Milla"],
+        answer: 0
+      },
+      {
+        q: "Quale squadra ha perso la finale di Coppa dei Campioni 1991-92 contro il Barcellona di Koeman?",
+        options: ["Benfica", "Sampdoria", "Marsiglia", "Stella Rossa"],
+        answer: 1
+      },
+      {
+        q: "Chi è stato il primo difensore a vincere il Pallone d'Oro nell'era moderna del dopoguerra?",
+        options: ["Franz Beckenbauer", "Fabio Cannavaro", "Matthias Sammer", "Gaetano Scirea"],
+        answer: 0
+      },
+      {
+        q: "Quale club italiano vinse la Serie A 1984-85?",
+        options: ["Roma", "Juventus", "Hellas Verona", "Inter"],
+        answer: 2
+      },
+      {
+        q: "Chi segnò la rete decisiva nella finale del Mondiale 2014?",
+        options: ["Thomas Müller", "Mario Götze", "Miroslav Klose", "André Schürrle"],
+        answer: 1
+      },
+      {
+        q: "Quale di questi NON ha mai vinto la classifica marcatori della Serie A?",
+        options: ["Edin Džeko", "Luca Toni", "Antonio Di Natale", "Ciro Immobile"],
+        answer: 0
+      },
+      {
+        q: "In quale stagione il Milan degli Invincibili di Capello chiuse la Serie A con una sola sconfitta?",
+        options: ["1990-91", "1991-92", "1993-94", "1994-95"],
+        answer: 1
+      },
+      {
+        q: "Chi era il capitano della Germania Ovest nella finale del Mondiale 1990?",
+        options: ["Lothar Matthäus", "Rudi Völler", "Jürgen Klinsmann", "Andreas Brehme"],
+        answer: 0
+      },
+      {
+        q: "Quale squadra eliminò l'Italia a USA '94?",
+        options: ["Brasile", "Argentina", "Bulgaria", "Nigeria"],
+        answer: 0
+      },
+      {
+        q: "Quale portiere ha vinto il Pallone d'Oro?",
+        options: ["Gianluigi Buffon", "Lev Jašin", "Iker Casillas", "Manuel Neuer"],
+        answer: 1
+      },
+      {
+        q: "Chi fu il capocannoniere della Serie A 2009-10?",
+        options: ["Antonio Di Natale", "Diego Milito", "Edinson Cavani", "Alberto Gilardino"],
+        answer: 0
+      }
+    ];
+
+    const setupScreen = document.getElementById('setupScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const resultScreen = document.getElementById('resultScreen');
+
+    const playersInput = document.getElementById('playersInput');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    const playerLabel = document.getElementById('playerLabel');
+    const questionLabel = document.getElementById('questionLabel');
+    const scoreLabel = document.getElementById('scoreLabel');
+    const timeLabel = document.getElementById('timeLabel');
+    const timerFill = document.getElementById('timerFill');
+    const questionText = document.getElementById('questionText');
+    const answersBox = document.getElementById('answersBox');
+    const statusText = document.getElementById('statusText');
+    const rankingBody = document.getElementById('rankingBody');
+
+    let players = [];
+    let currentPlayerIndex = 0;
+    let currentQuestionIndex = 0;
+    let timeLeft = QUESTION_TIME;
+    let countdown = null;
+    let locked = false;
+
+    function parsePlayers() {
+      return playersInput.value
+        .split(',')
+        .map(name => name.trim())
+        .filter(Boolean)
+        .map(name => ({ name, score: 0 }));
+    }
+
+    function startGame() {
+      players = parsePlayers();
+
+      if (players.length === 0) {
+        alert('Inserisci almeno un giocatore.');
+        return;
+      }
+
+      currentPlayerIndex = 0;
+      currentQuestionIndex = 0;
+      players.forEach(p => p.score = 0);
+
+      setupScreen.classList.add('hidden');
+      resultScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      clearInterval(countdown);
+      locked = false;
+      timeLeft = QUESTION_TIME;
+
+      const player = players[currentPlayerIndex];
+      const question = questions[currentQuestionIndex];
+
+      playerLabel.textContent = player.name;
+      questionLabel.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
+      scoreLabel.textContent = player.score;
+      timeLabel.textContent = `${timeLeft}s`;
+      timerFill.style.width = '100%';
+      statusText.textContent = '';
+      questionText.textContent = question.q;
+      answersBox.innerHTML = '';
+
+      question.options.forEach((option, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = option;
+        btn.onclick = () => submitAnswer(index, btn);
+        answersBox.appendChild(btn);
+      });
+
+      countdown = setInterval(() => {
+        timeLeft -= 1;
+        timeLabel.textContent = `${timeLeft}s`;
+        timerFill.style.width = `${(timeLeft / QUESTION_TIME) * 100}%`;
+
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function submitAnswer(selectedIndex, clickedButton) {
+      if (locked) return;
+      locked = true;
+      clearInterval(countdown);
+
+      const question = questions[currentQuestionIndex];
+      const buttons = Array.from(document.querySelectorAll('.answer-btn'));
+
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === question.answer) btn.classList.add('correct');
+      });
+
+      if (selectedIndex === question.answer) {
+        players[currentPlayerIndex].score += 1;
+        scoreLabel.textContent = players[currentPlayerIndex].score;
+        statusText.textContent = 'Risposta corretta.';
+      } else {
+        clickedButton.classList.add('wrong');
+        statusText.textContent = 'Risposta sbagliata.';
+      }
+
+      setTimeout(nextStep, 1200);
+    }
+
+    function handleTimeout() {
+      if (locked) return;
+      locked = true;
+      const question = questions[currentQuestionIndex];
+      const buttons = Array.from(document.querySelectorAll('.answer-btn'));
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === question.answer) btn.classList.add('correct');
+      });
+      statusText.textContent = 'Tempo scaduto.';
+      setTimeout(nextStep, 1200);
+    }
+
+    function nextStep() {
+      currentQuestionIndex += 1;
+
+      if (currentQuestionIndex < questions.length) {
+        loadQuestion();
+        return;
+      }
+
+      currentPlayerIndex += 1;
+
+      if (currentPlayerIndex < players.length) {
+        currentQuestionIndex = 0;
+        loadQuestion();
+        return;
+      }
+
+      showResults();
+    }
+
+    function showResults() {
+      clearInterval(countdown);
+      gameScreen.classList.add('hidden');
+      resultScreen.classList.remove('hidden');
+
+      const ranking = [...players].sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+      rankingBody.innerHTML = '';
+
+      ranking.forEach((player, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="${index === 0 ? 'first' : ''}">${index + 1}</td>
+          <td class="${index === 0 ? 'first' : ''}">${player.name}</td>
+          <td>${player.score}</td>
+        `;
+        rankingBody.appendChild(row);
+      });
+    }
+
+    function restartGame() {
+      playersInput.value = players.map(p => p.name).join(', ');
+      resultScreen.classList.add('hidden');
+      setupScreen.classList.remove('hidden');
+    }
+
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', restartGame);
+  </script>
+</body>
+</html>
